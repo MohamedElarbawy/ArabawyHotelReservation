@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain_Layer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,12 @@ namespace Infrastructure_Layer
 
         }
 
+        public DbSet<RoomType> RoomTypes { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<RoomSeason> RoomSeasons { get; set; }
+        public DbSet<MealPlan> MealPlans { get; set; }
+        public DbSet<MealPlanSeason> MealPlanSeaons { get; set; }
+        public DbSet<Reservation> Reservations{ get; set; }
         
 
 

@@ -1,6 +1,7 @@
 ﻿using Domain_Layer.Entities;
 using Domain_Layer.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,6 @@ namespace Infrastructure_Layer.Repos
         {
             _context = context;
         }
-
-
         public async Task<List<Room>> GetRoomsByIdList(List<int> idList, int take)
         {
             return await _context.Rooms
@@ -39,6 +38,12 @@ namespace Infrastructure_Layer.Repos
                  .Include(x => x.RoomSeasonList)
                  .FirstOrDefaultAsync(x => x.RoomTypeId == roomTypeId);
         }
+
+        public async Task<List<RoomType>> GetAllRoomTypes()
+        {
+           return await _context.RoomTypes.ToListAsync();
+        }
+
 
     }
 }

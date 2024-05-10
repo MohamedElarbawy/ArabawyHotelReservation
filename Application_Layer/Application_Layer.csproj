@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Infrastructure_Layer\Infrastructure_Layer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DtoS\" />
-  </ItemGroup>
-
 </Project>

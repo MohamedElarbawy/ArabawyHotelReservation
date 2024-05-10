@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using Application_Layer.DtoS;
+using CSharpFunctionalExtensions;
 using Domain_Layer.Entities;
 using Domain_Layer.Interfaces;
 using System;
@@ -22,19 +23,22 @@ namespace Application_Layer.Services
         }
 
 
-        public async Task<Result<Reservation>> CreateReservation(int roomTypeId, int mealPlanId, int noOfAdults, int noOfChildren, DateTime checkIn, DateTime checkOut, int noOfRooms,string? guestName,string? phoneNumber)
+        public async Task<Result<Reservation>> CreateReservation(ReservationCreateDto reservationDto)
         {
-            Maybe<RoomType> maybeRoomType = await _roomRepo.GetRoomTypeById(roomTypeId);
+            Maybe<RoomType> maybeRoomType = await _roomRepo.GetRoomTypeById(reservationDto.RoomTypeId);
             if (maybeRoomType.HasNoValue)
                 return Result.Failure<Reservation>("Room Type Not Found");
             var roomType = maybeRoomType.Value;
 
-            Maybe<MealPlan> maybeMealPlan = await _mealPlanRepo.GetMealPlanById(mealPlanId); 
+            Maybe<MealPlan> maybeMealPlan = await _mealPlanRepo.GetMealPlanById(reservationDto.MealPlanId); 
             if (maybeMealPlan.HasNoValue)
                 return Result.Failure<Reservation>("Meal Plan Not Found");
             var mealPlan = maybeMealPlan.Value;
 
-            List<int> allRoomsIdListByType = await _roomRepo.GetRoomsIdListByType(roomTypeId);
+            DateTime checkIn = reservationDto.CheckIn;
+            DateTime checkOut = reservationDto.CheckOut;
+
+            List<int> allRoomsIdListByType = await _roomRepo.GetRoomsIdListByType(reservationDto.RoomTypeId);
 
             List<int> reservedRoomsIdList = await _reservationRepo.GetReservedRoomsIdList(checkIn, checkOut, allRoomsIdListByType);
 
@@ -42,11 +46,11 @@ namespace Application_Layer.Services
 
             if (availableRoomsIdList.Count == 0)
                 return Result.Failure<Reservation>("There is no available rooms, You can try choose another room type or some other time");
-            if (availableRoomsIdList.Count < noOfRooms)
+            if (availableRoomsIdList.Count < reservationDto.NoOfRooms)
                 return Result.Failure<Reservation>($"There is no enough rooms, The available rooms now id {availableRoomsIdList.Count}");
 
 
-            var availableRooms = await _roomRepo.GetRoomsByIdList(idList: availableRoomsIdList, take: noOfRooms);
+            var availableRooms = await _roomRepo.GetRoomsByIdList(idList: availableRoomsIdList, take: reservationDto.NoOfRooms);
 
             var seasonsIntersectWithReservatoinTime = roomType.RoomSeasonList.Where(x =>
                 (x.SeasonStart <= checkIn && checkIn <= x.SeasonEnd) ||
@@ -57,7 +61,7 @@ namespace Application_Layer.Services
             decimal roomsCost = seasonsIntersectWithReservatoinTime.Sum(x =>
                     (GetMinDate(x.SeasonEnd, checkOut).Date - GetMaxDate(x.SeasonStart,checkIn).Date).Days 
                     * x.RatePerRoom
-                    ) * noOfRooms;
+                    ) * reservationDto.NoOfRooms;
 
 
 
@@ -69,7 +73,7 @@ namespace Application_Layer.Services
 
             decimal planCost = plsnSeasonsIntersectWithReservatoinTime.Sum(x =>
                     (GetMinDate(x.SeasonEnd, checkOut).Date - GetMaxDate(x.SeasonStart,checkIn).Date).Days 
-                    * (x.RatePerAdult * noOfAdults + x.RatePerChild * noOfChildren)
+                    * (x.RatePerAdult * reservationDto.NoOfAdults + x.RatePerChild * reservationDto.NoOfChildren)
                     );
 
 
@@ -82,15 +86,15 @@ namespace Application_Layer.Services
                 TotalCost = totalCost,
                 MealPlanCost = planCost,
                 RoomCost = roomsCost,
-                NoOfAdults = noOfAdults,
-                NoOfChildren = noOfChildren,
-                NoOfRooms = noOfRooms,
-                MealPlanId = mealPlanId,
+                NoOfAdults = reservationDto.NoOfAdults,
+                NoOfChildren = reservationDto.NoOfChildren,
+                NoOfRooms = reservationDto.NoOfRooms,
+                MealPlanId = reservationDto.MealPlanId,
                 MealPlan = mealPlan,
                 RoomList = availableRooms,
                 ReservationNo = 1,
-                GuestName = guestName,
-                PhoneNumber = phoneNumber,
+                GuestName = reservationDto.GuestName,
+                PhoneNumber = reservationDto.PhoneNumber,
 
             };
 

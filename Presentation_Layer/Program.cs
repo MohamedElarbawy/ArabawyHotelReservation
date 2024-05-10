@@ -1,3 +1,4 @@
+using Application_Layer.Services;
 using Domain_Layer.Interfaces;
 using Infrastructure_Layer;
 using Infrastructure_Layer.Repos;
@@ -10,6 +11,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IReservationRepo,ReservationRepo>();
 builder.Services.AddScoped<IRoomRepo,RoomRepo>();
 builder.Services.AddScoped<IMealPlanRepo,MealPlanRepo>();
+builder.Services.AddScoped<ReservationService>();
+builder.Services.AddScoped<MealPlanService>();
+builder.Services.AddScoped<RoomService>();
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
 options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));

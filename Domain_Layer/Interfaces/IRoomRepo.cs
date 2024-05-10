@@ -16,5 +16,6 @@ namespace Domain_Layer.Interfaces
 
         Task<RoomType?> GetRoomTypeById(int roomTypeId);
       
+        Task<List<RoomType>> GetAllRoomTypes();
     }
 }

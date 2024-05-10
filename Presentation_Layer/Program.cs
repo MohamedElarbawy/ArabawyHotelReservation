@@ -1,11 +1,14 @@
+using Domain_Layer.Interfaces;
 using Infrastructure_Layer;
+using Infrastructure_Layer.Repos;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddScoped<IReservationRepo,ReservationRepo>();
+builder.Services.AddScoped<IRoomRepo,RoomRepo>();
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
 options.UseSqlServer(builder.Configuration["ConnectionStrings:DefaultConnection"]));

@@ -25,8 +25,9 @@ namespace Domain_Layer.Entities
         public string? PhoneNumber { get; set; }
         public bool IsCanceled { get; set; }
 
-
-        public int RoomId { get; set; }
+        public decimal RoomCost { get; set; }
+        public decimal MealPlanCost { get; set; }
+        public decimal TotalCost { get; set; }
         public List<Room> RoomList { get; set; }
         public int MealPlanId { get; set; }
         public MealPlan MealPlan { get; set; }

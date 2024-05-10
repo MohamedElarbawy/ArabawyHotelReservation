@@ -19,9 +19,12 @@ namespace Infrastructure_Layer.Configurations
             builder.Property(p=>p.PhoneNumber).HasMaxLength(100);
             builder.Property(p=>p.CheckIn).HasColumnType("datetime");
             builder.Property(p=>p.CheckOut).HasColumnType("datetime");
-            
             builder.HasMany(p=>p.RoomList).WithMany();
             builder.HasOne(p=>p.MealPlan).WithMany().HasForeignKey(p=>p.MealPlanId).OnDelete(DeleteBehavior.NoAction);
+            
+            
+            
+            builder.HasQueryFilter(x => !x.IsCanceled);
         }
     }
 }

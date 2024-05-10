@@ -37,25 +37,52 @@ namespace Presentation_Layer.Controllers
                 Value = x.MealPlanId.ToString()
 
             });
-
+            ViewBag.Numberlist = Enumerable.Range(0, 10).Select(x => new SelectListItem
+            {
+                Text = x.ToString(),
+                Value = x.ToString()
+            });
+           
 
             return View();
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CreateReservation(ReservationCreateDto reservationCreateDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        ViewBag.ErrorMessage = "Please, Enter Required data";
+        //        return View("Index");
+        //    }
+
+        //    var reservationCreateResult = await _reservationService.CreateReservation(reservationCreateDto);
+        //    if(reservationCreateResult.IsFailure)
+        //    {
+        //        ViewBag.ErrorMessage = reservationCreateResult.Error;
+        //        return View(reservationCreateDto);
+        //    }
+
+        //    return View("Index");
+        //}
+
 
         [HttpPost]
         public async Task<IActionResult> CreateReservation(ReservationCreateDto reservationCreateDto)
         {
             if (!ModelState.IsValid)
-                return View(reservationCreateDto);
-
-            var reservationCreateResult = await _reservationService.CreateReservation(reservationCreateDto);
-            if(reservationCreateResult.IsFailure)
             {
-                ViewBag.ErrorMessage = reservationCreateResult.Error;
-                return View(reservationCreateDto);
+                return BadRequest("Please, Enter Required data");
             }
 
-            return RedirectToAction("Index");
+            var reservationCreateResult = await _reservationService.CreateReservation(reservationCreateDto);
+            if (reservationCreateResult.IsFailure)
+            {
+                return BadRequest(reservationCreateResult.Error);
+            }
+
+            return Json(reservationCreateResult.Value); 
         }
+
     }
 }

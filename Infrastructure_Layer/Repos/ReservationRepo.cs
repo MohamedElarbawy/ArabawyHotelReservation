@@ -52,5 +52,10 @@ namespace Infrastructure_Layer.Repos
             }
 
         }
+
+        public async Task<long> GetMaxReservationNO()
+        {
+            return await _context.Reservations.MaxAsync(x=>x.ReservationNo);
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasKey("MealPlanId");
 
-                    b.ToTable("MealPlans");
+                    b.ToTable("MealPlans", (string)null);
                 });
 
             modelBuilder.Entity("Domain_Layer.Entities.MealPlanSeason", b =>
@@ -67,7 +67,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasIndex("MealPlanId");
 
-                    b.ToTable("MealPlanSeaons");
+                    b.ToTable("MealPlanSeaons", (string)null);
                 });
 
             modelBuilder.Entity("Domain_Layer.Entities.Reservation", b =>
@@ -128,7 +128,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasIndex("MealPlanId");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservations", (string)null);
                 });
 
             modelBuilder.Entity("Domain_Layer.Entities.Room", b =>
@@ -155,7 +155,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("Domain_Layer.Entities.RoomSeason", b =>
@@ -182,7 +182,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("RoomSeasons");
+                    b.ToTable("RoomSeasons", (string)null);
                 });
 
             modelBuilder.Entity("Domain_Layer.Entities.RoomType", b =>
@@ -200,7 +200,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasKey("RoomTypeId");
 
-                    b.ToTable("RoomTypes");
+                    b.ToTable("RoomTypes", (string)null);
                 });
 
             modelBuilder.Entity("ReservationRoom", b =>
@@ -215,7 +215,7 @@ namespace Infrastructure_Layer.Migrations
 
                     b.HasIndex("RoomListRoomId");
 
-                    b.ToTable("ReservationRoom");
+                    b.ToTable("ReservationRoom", (string)null);
                 });
 
             modelBuilder.Entity("Domain_Layer.Entities.MealPlanSeason", b =>

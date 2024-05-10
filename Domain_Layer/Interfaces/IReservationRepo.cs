@@ -12,6 +12,6 @@ namespace Domain_Layer.Interfaces
     {
         Task<List<int>> GetReservedRoomsIdList(DateTime checkIn, DateTime checkOut, List<int> allRoomsIdListByType);
         Task<Result> AddReservation(Reservation reservation);
-
+        Task<long> GetMaxReservationNO();
     }
 }

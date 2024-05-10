@@ -57,6 +57,8 @@ namespace Application_Layer.Services
                 (x.SeasonStart <= checkOut && checkOut <= x.SeasonEnd) ||
                 (checkIn <= x.SeasonStart && x.SeasonEnd <= checkOut)
                 );
+            if(!seasonsIntersectWithReservatoinTime.Any())
+                return Result.Failure<Reservation>($"Sorry, Something wrong happend,Please try in another time");
 
             decimal roomsCost = seasonsIntersectWithReservatoinTime.Sum(x =>
                     (GetMinDate(x.SeasonEnd, checkOut).Date - GetMaxDate(x.SeasonStart,checkIn).Date).Days 
@@ -65,19 +67,22 @@ namespace Application_Layer.Services
 
 
 
-            var plsnSeasonsIntersectWithReservatoinTime = mealPlan.MealplanSeasonList.Where(x =>
+            var plansSeasonsIntersectWithReservatoinTime = mealPlan.MealplanSeasonList.Where(x =>
                 (x.SeasonStart <= checkIn && checkIn <= x.SeasonEnd) ||
                 (x.SeasonStart <= checkOut && checkOut <= x.SeasonEnd) ||
                 (checkIn <= x.SeasonStart && x.SeasonEnd <= checkOut)
                 );
+            if(!plansSeasonsIntersectWithReservatoinTime.Any())
+                return Result.Failure<Reservation>($"Sorry, Something wrong happend,Please try in another time");
 
-            decimal planCost = plsnSeasonsIntersectWithReservatoinTime.Sum(x =>
+            decimal planCost = plansSeasonsIntersectWithReservatoinTime.Sum(x =>
                     (GetMinDate(x.SeasonEnd, checkOut).Date - GetMaxDate(x.SeasonStart,checkIn).Date).Days 
                     * (x.RatePerAdult * reservationDto.NoOfAdults + x.RatePerChild * reservationDto.NoOfChildren)
                     );
 
 
             decimal totalCost = roomsCost + planCost;
+            long maxReservationNo = await _reservationRepo.GetMaxReservationNO();
 
             var reservation = new Reservation
             {
@@ -92,7 +97,7 @@ namespace Application_Layer.Services
                 MealPlanId = reservationDto.MealPlanId,
                 MealPlan = mealPlan,
                 RoomList = availableRooms,
-                ReservationNo = 1,
+                ReservationNo = maxReservationNo + 1,
                 GuestName = reservationDto.GuestName,
                 PhoneNumber = reservationDto.PhoneNumber,
 

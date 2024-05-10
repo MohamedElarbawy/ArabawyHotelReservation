@@ -5,6 +5,7 @@
 @model Application_Layer.DtoS.ReservationCreateDto
 @{
     var errorMessage = ViewBag.ErrorMessage as string;
+    string DateNow = DateTime.Now.Date.ToString("mm/dd/yyyy");
 }
 
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -63,30 +64,28 @@
             <div class="container">
                 <div class="row ">
                     <div class="col-12">
-                <form asp-action="CreateReservation" asp-controller="Home" method="post">
+                <form id="reservationForm"  asp-action="CreateReservation" asp-controller="Home" method="post">
                             <div class="booking-wrap d-flex justify-content-between align-items-center">
 
                                 <!-- select in date -->
                                 <div class="single-select-box mb-30">
-                                    <!-- select out date -->
-                                    <div class="boking-tittle">
+                                        <div class="boking-tittle">
                                         <span> Check In Date:</span>
                                     </div>
                                     <div class="boking-datepicker">
-                                        <input id="datepicker1" placeholder="10/12/2020" />
+                                <input id="datepicker1" placeholder="06/06/2024" asp-for="CheckIn" />
                                     </div>
                                 </div>
                                 <!-- select out date -->
                                 <div class="single-select-box mb-30">
-                                    <!-- select out date -->
                                     <div class="boking-tittle">
                                         <span>Check OutDate:</span>
                                     </div>
                                     <div class="boking-datepicker">
-                                        <input id="datepicker2" placeholder="12/12/2020" />
+                                <input id="datepicker2" placeholder="06/06/2024" asp-for="CheckOut" />
                                     </div>
                                 </div>
-                                <!-- Single Select Box -->
+                                <!-- Single Select room type -->
                                 <div class="single-select-box mb-30">
                                     <div class="boking-tittle">
                                         <span>Room Type:</span>
@@ -100,7 +99,21 @@
                                             </div>
                                       </div>
                                 </div>
-                                <!-- Single Select Box -->
+                                <!-- Single Select meal plan -->
+                                <div class="single-select-box mb-30">
+                                    <div class="boking-tittle">
+                                        <span>Meal Plan:</span>
+                                    </div>
+                                    <div class="select-this">
+                                  
+                                            <div class="select-itms">
+                                    <select asp-items="ViewBag.MealPlans" asp-for="MealPlanId">
+                                                <option selected="">Choose Meal Plan...</option>
+                                            </select>
+                                            </div>
+                                      </div>
+                                </div>
+                                <!-- Single Select adults -->
                                 <div class="single-select-box mb-30">
                                     <div class="boking-tittle">
                                         <span>Adults:</span>
@@ -108,16 +121,13 @@
                                     <div class="select-this">
                                   
                                             <div class="select-itms">
-                                                <select name="select" id="select1">
-                                                    <option value="">1</option>
-                                                    <option value="">2</option>
-                                                    <option value="">3</option>
-                                                    <option value="">4</option>
+                                    <select asp-items="ViewBag.Numberlist" asp-for="NoOfAdults">
+                                        <option selected="1"></option>
                                                 </select>
                                             </div>
                                       </div>
                                 </div>
-                                <!-- Single Select Box -->
+                                <!-- Single Select children -->
                                 <div class="single-select-box mb-30">
                                     <div class="boking-tittle">
                                         <span>Children:</span>
@@ -125,35 +135,30 @@
                                     <div class="select-this">
 
                                             <div class="select-itms">
-                                                <select name="select" id="select2">
-                                                    <option value="">1</option>
-                                                    <option value="">2</option>
-                                                    <option value="">3</option>
-                                                    <option value="">4</option>
-                                                </select>
+                                    <select asp-items="ViewBag.Numberlist" asp-for="NoOfChildren">
+                                        <option selected="0"></option>
+                                    </select>
                                             </div>
 
                                     </div>
                                 </div>
-                                <!-- Single Select Box -->
+                                <!-- Single Select rooms -->
                                 <div class="single-select-box mb-30">
                                     <div class="boking-tittle">
                                         <span>Rooms:</span>
                                     </div>
                                     <div class="select-this">
                                             <div class="select-itms">
-                                                <select name="select" id="select3">
-                                                    <option value="">1</option>
-                                                    <option value="">2</option>
-                                                    <option value="">3</option>
-                                                    <option value="">4</option>
-                                                </select>
+                                    <select asp-items="ViewBag.Numberlist" asp-for="NoOfRooms">
+                                        <option selected="1"></option>
+                                    </select>
                                             </div>
                                     </div>
                                 </div>
                                 <!-- Single Select Box -->
                                 <div class="single-select-box pt-45 mb-30">
-                                    <a href="#" class="btn select-btn">Book Now</a>
+                                  @*   <a href="#" class="btn select-btn">Book Now</a> *@
+                                    <button type="submit" class="btn select-btn">Book Now</button>
                                 </div>
 
 
@@ -506,5 +511,29 @@
             </div>
         </div>
         <!-- Gallery img End-->
- 
-   
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#reservationForm').submit(function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            var formData = $(this).serialize(); // Serialize form data
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateReservation", "Home")', // Update with your controller and action names
+                data: formData,
+                success: function (response) {
+                    // Handle successful response (e.g., redirect to another page)
+                   // window.location.href = response.redirectUrl;
+                    alertify.success("success");
+                },
+                error: function (xhr, status, error) {
+                    // Handle errors (e.g., display error message)
+                    alertify.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>

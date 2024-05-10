@@ -13,10 +13,12 @@ namespace Application_Layer.Services
     {
         private readonly IReservationRepo _reservationRepo;
         private readonly IRoomRepo _roomRepo;
-        public ReservationService(IReservationRepo reservationRepo, IRoomRepo roomRepo)
+        private readonly IMealPlanRepo _mealPlanRepo;
+        public ReservationService(IReservationRepo reservationRepo, IRoomRepo roomRepo, IMealPlanRepo mealPlanRepo)
         {
             _reservationRepo = reservationRepo;
             _roomRepo = roomRepo;
+            _mealPlanRepo = mealPlanRepo;
         }
 
 
@@ -27,7 +29,7 @@ namespace Application_Layer.Services
                 return Result.Failure<Reservation>("Room Type Not Found");
             var roomType = maybeRoomType.Value;
 
-            Maybe<MealPlan> maybeMealPlan = await _roomRepo.GetMealPlanById(mealPlanId); 
+            Maybe<MealPlan> maybeMealPlan = await _mealPlanRepo.GetMealPlanById(mealPlanId); 
             if (maybeMealPlan.HasNoValue)
                 return Result.Failure<Reservation>("Meal Plan Not Found");
             var mealPlan = maybeMealPlan.Value;

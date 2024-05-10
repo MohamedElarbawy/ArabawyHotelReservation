@@ -15,6 +15,6 @@ namespace Domain_Layer.Interfaces
         Task<List<Room>> GetRoomsByIdList(List<int> idList,int take);
 
         Task<RoomType?> GetRoomTypeById(int roomTypeId);
-        Task<MealPlan?> GetMealPlanById(int mealPlanId);
+      
     }
 }

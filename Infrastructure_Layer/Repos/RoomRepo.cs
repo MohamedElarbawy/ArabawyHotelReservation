@@ -39,11 +39,6 @@ namespace Infrastructure_Layer.Repos
                  .Include(x => x.RoomSeasonList)
                  .FirstOrDefaultAsync(x => x.RoomTypeId == roomTypeId);
         }
-        public async Task<MealPlan?> GetMealPlanById(int mealPlanId)
-        {
-            return await _context.MealPlans
-                 .Include(x => x.MealplanSeasonList)
-                 .FirstOrDefaultAsync(x => x.MealPlanId == mealPlanId);
-        }
+
     }
 }

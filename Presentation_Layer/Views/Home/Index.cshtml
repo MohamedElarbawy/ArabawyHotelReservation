@@ -5,7 +5,7 @@
 @model Application_Layer.DtoS.ReservationCreateDto
 @{
     var errorMessage = ViewBag.ErrorMessage as string;
-    string DateNow = DateTime.Now.Date.ToString("mm/dd/yyyy");
+    var DateNow = DateTime.Now.Date;
 }
 
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -73,16 +73,16 @@
                                         <span> Check In Date:</span>
                                     </div>
                                     <div class="boking-datepicker">
-                                <input id="datepicker1" placeholder="06/06/2024" asp-for="CheckIn" />
+                                <input id="datepicker1" value="@DateNow" name="CheckIn" />
                                     </div>
                                 </div>
                                 <!-- select out date -->
                                 <div class="single-select-box mb-30">
                                     <div class="boking-tittle">
-                                        <span>Check OutDate:</span>
+                                        <span>Check Out Date:</span>
                                     </div>
                                     <div class="boking-datepicker">
-                                <input id="datepicker2" placeholder="06/06/2024" asp-for="CheckOut" />
+                                <input id="datepicker2" value="@DateNow" name="CheckOut" />
                                     </div>
                                 </div>
                                 <!-- Single Select room type -->
@@ -94,7 +94,7 @@
                                   
                                             <div class="select-itms">
                                              <select asp-items="ViewBag.RoomTypes" asp-for="RoomTypeId">
-                                                <option selected="">Choose Room Type...</option>
+                                                <option selected>Choose Room Type...</option>
                                             </select>
                                             </div>
                                       </div>
@@ -108,7 +108,7 @@
                                   
                                             <div class="select-itms">
                                     <select asp-items="ViewBag.MealPlans" asp-for="MealPlanId">
-                                                <option selected="">Choose Meal Plan...</option>
+                                                <option selected>Choose Meal Plan...</option>
                                             </select>
                                             </div>
                                       </div>
@@ -122,7 +122,7 @@
                                   
                                             <div class="select-itms">
                                     <select asp-items="ViewBag.Numberlist" asp-for="NoOfAdults">
-                                        <option selected="1"></option>
+                                        <option></option>
                                                 </select>
                                             </div>
                                       </div>
@@ -135,8 +135,8 @@
                                     <div class="select-this">
 
                                             <div class="select-itms">
-                                    <select asp-items="ViewBag.Numberlist" asp-for="NoOfChildren">
-                                        <option selected="0"></option>
+                                    <select asp-items="ViewBag.ChildrenNumberlist" asp-for="NoOfChildren">
+                                        <option></option>
                                     </select>
                                             </div>
 
@@ -150,7 +150,7 @@
                                     <div class="select-this">
                                             <div class="select-itms">
                                     <select asp-items="ViewBag.Numberlist" asp-for="NoOfRooms">
-                                        <option selected="1"></option>
+                                        <option></option>
                                     </select>
                                             </div>
                                     </div>
@@ -511,6 +511,68 @@
             </div>
         </div>
         <!-- Gallery img End-->
+<!-- popup-->
+<div id="reservationDetailsModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="reservationDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservationDetailsModalLabel">Reservation Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Reservation details content -->
+                <dl class="row">
+                    <dt class="col-sm-3">ID</dt>
+                    <dd class="col-sm-9" id="reservationId"></dd>
+                    
+                    <dt class="col-sm-5">Reservation NO</dt>
+                    <dd class="col-sm-7" id="ReservationNo"></dd>
+                    
+                    <dt class="col-sm-5">Check In</dt>
+                    <dd class="col-sm-7" id="checkIn"></dd>
+                    
+                    <dt class="col-sm-5">Check Out</dt>
+                    <dd class="col-sm-7" id="checkOut"></dd>
+                    
+                   <dt class="col-sm-5">Room Numbers</dt>
+                    <dd class="col-sm-7" id="RoomNumbers"></dd>
+                    
+                    <dt class="col-sm-5">NO Of Adults</dt>
+                    <dd class="col-sm-7" id="noOfAdults"></dd>
+                    
+                    <dt class="col-sm-5">NO Of Children</dt>
+                    <dd class="col-sm-7" id="noOfChildren"></dd>
+                    
+                    <dt class="col-sm-5">NO Of Rooms</dt>
+                    <dd class="col-sm-7" id="noOfRooms"></dd>
+                    
+                    <dt class="col-sm-5">Meal Plan</dt>
+                    <dd class="col-sm-7" id="MealPlan"></dd>
+                    
+                    <dt class="col-sm-5">Room Cost</dt>
+                    <dd class="col-sm-7" id="RoomCost"></dd>
+                    
+                    <dt class="col-sm-5">Meal Plan Cost</dt>
+                    <dd class="col-sm-7" id="MealPlanCost"></dd>
+                    
+                    <dt class="col-sm-5">Total Cost</dt>
+                    <dd class="col-sm-7" id="TotalCost"></dd>
+
+                    <!-- Add other reservation details here -->
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Poroceed To Payment Page</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- popup-->
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -525,9 +587,21 @@
                 url: '@Url.Action("CreateReservation", "Home")', // Update with your controller and action names
                 data: formData,
                 success: function (response) {
-                    // Handle successful response (e.g., redirect to another page)
-                   // window.location.href = response.redirectUrl;
-                    alertify.success("success");
+                    alertify.success("Saved Successfully");
+                    $('#reservationId').text(response.reservation.reservationGuid);
+                    $('#ReservationNo').text(response.reservation.reservationNo);
+                    $('#checkIn').text(response.reservation.checkIn);
+                    $('#checkOut').text(response.reservation.checkOut);
+                    $('#noOfAdults').text(response.reservation.noOfAdults);
+                    $('#noOfChildren').text(response.reservation.noOfChildren);
+                    $('#noOfRooms').text(response.reservation.noOfRooms);
+                    $('#RoomCost').text(response.reservation.roomCost);
+                    $('#MealPlanCost').text(response.reservation.mealPlanCost);
+                    $('#TotalCost').text(response.reservation.totalCost);
+                    $('#RoomNumbers').text(response.reservation.roomNumbers);
+                    $('#MealPlan').text(response.reservation.mealPlan);
+
+                    $('#reservationDetailsModal').modal('show');
                 },
                 error: function (xhr, status, error) {
                     // Handle errors (e.g., display error message)
@@ -537,3 +611,8 @@
         });
     });
 </script>
+
+
+
+
+

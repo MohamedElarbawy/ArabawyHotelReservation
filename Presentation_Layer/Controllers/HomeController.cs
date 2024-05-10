@@ -37,34 +37,22 @@ namespace Presentation_Layer.Controllers
                 Value = x.MealPlanId.ToString()
 
             });
-            ViewBag.Numberlist = Enumerable.Range(0, 10).Select(x => new SelectListItem
+            ViewBag.ChildrenNumberlist = Enumerable.Range(0, 10).Select(x => new SelectListItem
             {
                 Text = x.ToString(),
-                Value = x.ToString()
+                Value = x.ToString(),
+                Selected = x == 0
             });
-           
+
+            ViewBag.Numberlist = Enumerable.Range(1, 10).Select(x => new SelectListItem
+            {
+                Text = x.ToString(),
+                Value = x.ToString(),
+                Selected = x == 1
+            });
 
             return View();
         }
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreateReservation(ReservationCreateDto reservationCreateDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        ViewBag.ErrorMessage = "Please, Enter Required data";
-        //        return View("Index");
-        //    }
-
-        //    var reservationCreateResult = await _reservationService.CreateReservation(reservationCreateDto);
-        //    if(reservationCreateResult.IsFailure)
-        //    {
-        //        ViewBag.ErrorMessage = reservationCreateResult.Error;
-        //        return View(reservationCreateDto);
-        //    }
-
-        //    return View("Index");
-        //}
 
 
         [HttpPost]
@@ -81,7 +69,7 @@ namespace Presentation_Layer.Controllers
                 return BadRequest(reservationCreateResult.Error);
             }
 
-            return Json(reservationCreateResult.Value); 
+            return Json(new { success = true, reservation = reservationCreateResult.Value }); 
         }
 
     }

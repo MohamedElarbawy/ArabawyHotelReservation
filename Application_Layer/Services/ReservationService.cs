@@ -23,20 +23,21 @@ namespace Application_Layer.Services
         }
 
 
-        public async Task<Result<Reservation>> CreateReservation(ReservationCreateDto reservationDto)
+        public async Task<Result<ReservationDto>> CreateReservation(ReservationCreateDto reservationDto)
         {
-            Maybe<RoomType> maybeRoomType = await _roomRepo.GetRoomTypeById(reservationDto.RoomTypeId);
-            if (maybeRoomType.HasNoValue)
-                return Result.Failure<Reservation>("Room Type Not Found");
-            var roomType = maybeRoomType.Value;
-
-            Maybe<MealPlan> maybeMealPlan = await _mealPlanRepo.GetMealPlanById(reservationDto.MealPlanId); 
-            if (maybeMealPlan.HasNoValue)
-                return Result.Failure<Reservation>("Meal Plan Not Found");
-            var mealPlan = maybeMealPlan.Value;
 
             DateTime checkIn = reservationDto.CheckIn;
             DateTime checkOut = reservationDto.CheckOut;
+            Maybe<RoomType> maybeRoomType = await _roomRepo.GetRoomTypeById(reservationDto.RoomTypeId);
+            Maybe<MealPlan> maybeMealPlan = await _mealPlanRepo.GetMealPlanById(reservationDto.MealPlanId); 
+            
+            var validationResult = ValidateReservation(checkIn, checkOut, maybeRoomType,maybeMealPlan,reservationDto.NoOfAdults,reservationDto.NoOfRooms);
+
+            if (validationResult.IsFailure)
+                return Result.Failure<ReservationDto>(validationResult.Error);
+
+            var roomType = maybeRoomType.Value;
+            var mealPlan = maybeMealPlan.Value;
 
             List<int> allRoomsIdListByType = await _roomRepo.GetRoomsIdListByType(reservationDto.RoomTypeId);
 
@@ -45,9 +46,9 @@ namespace Application_Layer.Services
             List<int> availableRoomsIdList = allRoomsIdListByType.Except(reservedRoomsIdList).ToList();
 
             if (availableRoomsIdList.Count == 0)
-                return Result.Failure<Reservation>("There is no available rooms, You can try choose another room type or some other time");
+                return Result.Failure<ReservationDto>("There is no available rooms, You can try choose another room type or some other time");
             if (availableRoomsIdList.Count < reservationDto.NoOfRooms)
-                return Result.Failure<Reservation>($"There is no enough rooms, The available rooms now id {availableRoomsIdList.Count}");
+                return Result.Failure<ReservationDto>($"There is no enough rooms, The available rooms now id {availableRoomsIdList.Count}");
 
 
             var availableRooms = await _roomRepo.GetRoomsByIdList(idList: availableRoomsIdList, take: reservationDto.NoOfRooms);
@@ -58,7 +59,7 @@ namespace Application_Layer.Services
                 (checkIn <= x.SeasonStart && x.SeasonEnd <= checkOut)
                 );
             if(!seasonsIntersectWithReservatoinTime.Any())
-                return Result.Failure<Reservation>($"Sorry, Something wrong happend,Please try in another time");
+                return Result.Failure<ReservationDto>($"Sorry, Something wrong happend,Please try in another time");
 
             decimal roomsCost = seasonsIntersectWithReservatoinTime.Sum(x =>
                     (GetMinDate(x.SeasonEnd, checkOut).Date - GetMaxDate(x.SeasonStart,checkIn).Date).Days 
@@ -73,7 +74,7 @@ namespace Application_Layer.Services
                 (checkIn <= x.SeasonStart && x.SeasonEnd <= checkOut)
                 );
             if(!plansSeasonsIntersectWithReservatoinTime.Any())
-                return Result.Failure<Reservation>($"Sorry, Something wrong happend,Please try in another time");
+                return Result.Failure<ReservationDto>($"Sorry, Something wrong happend,Please try in another time");
 
             decimal planCost = plansSeasonsIntersectWithReservatoinTime.Sum(x =>
                     (GetMinDate(x.SeasonEnd, checkOut).Date - GetMaxDate(x.SeasonStart,checkIn).Date).Days 
@@ -105,11 +106,29 @@ namespace Application_Layer.Services
 
             var saveReservationResult = await _reservationRepo.AddReservation(reservation);
             if(saveReservationResult.IsFailure)
-                return Result.Failure<Reservation>(saveReservationResult.Error);
+                return Result.Failure<ReservationDto>(saveReservationResult.Error);
 
 
 
-            return Result.Success(reservation);
+            return Result.Success(ReservationDto.MapFrom(reservation));
+        }
+
+
+        private Result ValidateReservation(DateTime checkIn, DateTime checkOut,Maybe<RoomType> maybeRoomType, Maybe<MealPlan> maybeMealPlan , int noOfAdults,int noOfRooms)
+        {
+            if (checkIn >= checkOut)
+                return Result.Failure("Check Out Can't Be Before Check In");
+            if (!(noOfAdults > 0))
+                return Result.Failure("Enter Number Of Adults");
+            if (!(noOfRooms > 0))
+                return Result.Failure("Enter Number Of Rooms");
+            if (maybeRoomType.HasNoValue)
+                return Result.Failure("Room Type Not Found");
+            if (maybeMealPlan.HasNoValue)
+                return Result.Failure("Meal Plan Not Found");
+
+
+            return Result.Success();
         }
 
 
